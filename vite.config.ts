@@ -1,27 +1,29 @@
-import { defineConfig,loadEnv } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 // https://vitejs.dev/config/
 import { viteMockServe } from 'vite-plugin-mock'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
-export default defineConfig(({ command,mode }) => {
-  let env = loadEnv(mode,process.cwd())
+export default defineConfig(({ command, mode }) => {
+  let env = loadEnv(mode, process.cwd())
 
   return {
-    plugins: [vue(),
-    createSvgIconsPlugin({
-      // Specify the icon folder to be cached
-      iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
-      // Specify symbolId format
-      symbolId: 'icon-[dir]-[name]',
-    }),
-    viteMockServe({
-      localEnabled: command === 'serve',
-    }),],
+    plugins: [
+      vue(),
+      createSvgIconsPlugin({
+        // Specify the icon folder to be cached
+        iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
+        // Specify symbolId format
+        symbolId: 'icon-[dir]-[name]',
+      }),
+      viteMockServe({
+        localEnabled: command === 'serve',
+      }),
+    ],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src')
-      }
+        '@': path.resolve(__dirname, './src'),
+      },
     },
     css: {
       preprocessorOptions: {
@@ -41,8 +43,8 @@ export default defineConfig(({ command,mode }) => {
           changeOrigin: true,
           //路径重写
           rewrite: (path) => path.replace(/^\/api/, ''),
-        }
-      }
-    }
+        },
+      },
+    },
   }
 })

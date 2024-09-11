@@ -8,56 +8,53 @@ import useUserStore from './store/modules/user'
 let userStore = useUserStore(pinia)
 //加载进度条小圆球
 nprogress.configure({
-    showSpinner: false
+  showSpinner: false,
 })
 router.beforeEach(async (to: any, from: any, next: any) => {
-    document.title = '硅谷运营' + '-' + to.meta.title
-    nprogress.start()
+  document.title = '硅谷运营' + '-' + to.meta.title
+  nprogress.start()
 
-    let token = userStore.token
-    let username = userStore.username
-    if (token) {
-        // 登录成功
+  let token = userStore.token
+  let username = userStore.username
+  if (token) {
+    // 登录成功
 
-        if (to.path == '/login') {
-            next('/')
-        } else {
-            if (username) {
-                next()
-            } else {
-                try {
-                    await userStore.getUserInfo()
-                    next()
-                } catch (error) {
-                    //token过期
-                    userStore.userLogout()
-                    next({
-                        path: '/login',
-                        query: {
-                            redirect: to.path
-                        }
-                    })
-                }
-
-            }
-
-
-        }
+    if (to.path == '/login') {
+      next('/')
     } else {
-        //登录失败
-        if (to.path == '/login') {
-            next()
-        } else {
-            next({
-                path: '/login',
-                query: {
-                    redirect: to.path
-                }
-            })
+      if (username) {
+        next()
+      } else {
+        try {
+          await userStore.getUserInfo()
+          next()
+        } catch (error) {
+          //token过期
+          userStore.userLogout()
+          next({
+            path: '/login',
+            query: {
+              redirect: to.path,
+            },
+          })
         }
+      }
     }
+  } else {
+    //登录失败
+    if (to.path == '/login') {
+      next()
+    } else {
+      next({
+        path: '/login',
+        query: {
+          redirect: to.path,
+        },
+      })
+    }
+  }
 })
 
 router.afterEach((to: any, from: any, next: any) => {
-    nprogress.done()
+  nprogress.done()
 })

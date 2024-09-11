@@ -1,16 +1,14 @@
-import { createRouter, createWebHashHistory } from "vue-router";
-import { constRoute } from "./routes";
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { constRoute } from './routes'
 let router = createRouter({
-    history: createWebHashHistory(),
-    routes: constRoute,
-    scrollBehavior(){
-        return{
-            left:0,
-            top:0
-        }
+  history: createWebHashHistory(),
+  routes: constRoute,
+  scrollBehavior() {
+    return {
+      left: 0,
+      top: 0,
     }
-});
+  },
+})
 
-
-
-export default router; 
+export default router

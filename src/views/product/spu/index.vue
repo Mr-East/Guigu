@@ -1,10 +1,7 @@
 <template>
-    <div>spu</div>
-  </template>
-  
-  <script setup lang="ts">
-   
-  </script>
-  
-  <style scoped lang="scss">
-  </style>
+  <div>spu</div>
+</template>
+
+<script setup lang="ts"></script>
+
+<style scoped lang="scss"></style>

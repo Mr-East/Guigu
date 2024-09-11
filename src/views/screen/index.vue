@@ -1,9 +1,7 @@
 <template>
-    <div>我是数据大屏</div>
+  <div>我是数据大屏</div>
 </template>
 
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <style scoped lang="scss"></style>
