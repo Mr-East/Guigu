@@ -39,8 +39,8 @@ let userStore = useUserStore()
 let LayoutSettingStore = useLayoutSettingStore()
 let $route = useRoute()
 let $router = useRouter()
-const logout = () => {
-  userStore.userLogout()
+ const  logout = async () => {
+  await  userStore.userLogout()
   $router.push({ path: '/login', query: { redirect: $route.path } })
 }
 // 刷新

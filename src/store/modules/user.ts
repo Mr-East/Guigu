@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { loginForm, loginResponse } from '../../api/user/type'
-import { reqLogin, reqUserInfo } from '../../api/user'
+import type { ResponseData,loginResponseData,loginFromData,userInfoResponseData } from '@/api/type'
+import { reqLogin, reqUserInfo, reqLogout } from '../../api/user'
 import { UserState } from './types/type'
 import { SET_TOKEN, GET_TOKEN } from '../../utils/token'
 import { constRoute } from '../../router/routes'
@@ -17,37 +17,48 @@ let useUserStore = defineStore('User', {
   },
   // 异步逻辑
   actions: {
-    async userLogin(data: loginForm) {
-      let res: loginResponse = await reqLogin(data)
+    async userLogin(data: loginFromData) {
+      let res: loginResponseData = await reqLogin(data)
+
+
       if (res.code == 200) {
-        this.token = res.data.token as string
-        SET_TOKEN(res.data.token as string)
+
+        this.token = res.data as string
+        SET_TOKEN(res.data as string)
         return 'ok'
       } else {
-        console.log(res.data.message)
+        console.log(res.message)
 
-        return Promise.reject(new Error(res.data.message))
+        return Promise.reject(new Error(res.message))
       }
     },
     async getUserInfo() {
       let res = await reqUserInfo()
       if (res.code == 200) {
-        this.username = res.data.checkUser.username
-        this.avatar = res.data.checkUser.avatar
+        this.username = res.data.name
+        this.avatar = res.data.avatar
         return 'ok'
       } else {
         return Promise.reject('获取用户信息失败')
       }
     },
-    userLogout() {
-      this.username = ''
-      this.avatar = ''
-      this.token = ''
-      SET_TOKEN('')
+    async userLogout() {
+      let res = await reqLogout()
+      if (res.code == 200) {
+        this.username = ''
+        this.avatar = ''
+        this.token = ''
+        SET_TOKEN('')
+        return 'ok';
+      }else{
+        Promise.reject(res.message)
+      }}
+
     },
     // 计算属性
     getters: {},
-  },
-})
+  }
+
+)
 
 export default useUserStore

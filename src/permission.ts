@@ -30,7 +30,7 @@ router.beforeEach(async (to: any, from: any, next: any) => {
           next()
         } catch (error) {
           //token过期
-          userStore.userLogout()
+          await userStore.userLogout()
           next({
             path: '/login',
             query: {

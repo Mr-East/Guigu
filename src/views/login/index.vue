@@ -47,8 +47,8 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElNotification, FormRules } from 'element-plus'
 import { time } from '../../utils/time'
 let loginForm = reactive({
-  username: '',
-  password: '',
+  username: 'admin',
+  password: '111111',
 })
 let $router = useRouter()
 let $route: any = useRoute()

@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import path from 'path'
 // https://vitejs.dev/config/
 import { viteMockServe } from 'vite-plugin-mock'
-import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import { createSvgIconsPlugin } from ' vite-plugin-svg-icons'
 export default defineConfig(({ command, mode }) => {
   let env = loadEnv(mode, process.cwd())
 
