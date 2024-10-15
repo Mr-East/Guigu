@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { ResponseData,loginResponseData,loginFromData,userInfoResponseData } from './type'
+import type { loginResponseData,loginFromData,userInfoResponseData } from './type'
 enum API {
   LOGIN_URL = '/admin/acl/index/login',
   USERINFO_URL = '/admin/acl/index/info',

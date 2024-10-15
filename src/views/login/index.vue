@@ -48,7 +48,7 @@ import { ElNotification, FormRules } from 'element-plus'
 import { time } from '../../utils/time'
 let loginForm = reactive({
   username: 'admin',
-  password: '111111',
+  password: '11111',
 })
 let $router = useRouter()
 let $route: any = useRoute()

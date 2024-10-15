@@ -85,7 +85,7 @@ onMounted(() => {
     left: $base-menu-width;
     width: calc(100% - $base-menu-width);
     height: calc(100% - $base-menu-tabbar-height);
-    background-color: yellow;
+  
     overflow: auto;
     padding: 20px;
     transition: all 0.3s;
