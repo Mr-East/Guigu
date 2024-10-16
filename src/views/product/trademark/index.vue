@@ -49,12 +49,13 @@
         <el-form-item label="品牌头像"> 
           <el-upload
             class="avatar-uploader"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            action="/api/admin/product/fileUpload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
+            
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <img v-if="trademarkParams.logoUrl" :src="trademarkParams.logoUrl" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
@@ -72,12 +73,16 @@
 import { onMounted, ref } from "vue";
 import { reqGetTradeMarkList } from "../../../api/product/trademark";
 import type { Records } from "../../../api/product/trademark/type";
+import { ElMessage, type UploadProps } from 'element-plus'
 const limit = ref(3);
 const currentPage = ref(1);
 const currentTradeMarkList = ref<Records>([]);
 const dialogFormVisible = ref(false);
 const trademarkName = ref("");
-
+const trademarkParams = ref({
+  tmName:'',
+  logoUrl:''  
+})
 const addTradeMark = () => {
   dialogFormVisible.value = true;
 };
@@ -99,6 +104,38 @@ const getCurrentList = async (pager = 1) => {
 onMounted(() => {
   getCurrentList();
 });
+
+
+// 上传图片之前的hooks
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if(rawFile.type =='image/png' || 'image/jpeg'|| 'image/gif'){
+    if(rawFile.size/1024/1024<4){
+
+    } else{
+      ElMessage({
+        type:'warning',
+        message:'文件大小应该小于4MB'
+      })
+    }
+  }else{
+    ElMessage({
+      type:'warning',
+      message:'文件类型应为Png|Gif|jepg'
+    })
+  }
+}
+// 上传成功之后的hooks
+const handleAvatarSuccess: UploadProps['onSuccess'] = (
+  response,
+) => {
+  console.log(111);
+  
+  trademarkParams.value.logoUrl = response.data
+  ElMessage({
+    type:'success',
+    message:'上传成功'
+  })
+}
 </script>
 
 <style scoped>
