@@ -1,8 +1,11 @@
 <template>
   <div>
     <el-card>
-      <el-button size="default" type="primary" style="margin-bottom: 20px" 
-      @click="addTradeMark"
+      <el-button
+        size="default"
+        type="primary"
+        style="margin-bottom: 20px"
+        @click="addTradeMark"
         >添加品牌</el-button
       >
       <!-- 表格 -->
@@ -15,9 +18,22 @@
           </template>
         </el-table-column>
         <el-table-column label="操作">
-          <template #="{ row, $index }">
-            <el-button type="primary" size="small" icon="Edit" @click="editTradeMark(row)"></el-button>
-            <el-button type="primary" size="small" icon="Delete"></el-button>
+          <template #="{ row }">
+            <el-button
+              type="primary"
+              size="small"
+              icon="Edit"
+              @click="editTradeMark(row)"
+            ></el-button>
+            <el-popconfirm
+              :title="`您确认要删除${row.tmName}吗`"
+              @confirm="deleteTradeMark(row)"
+              :width="250"
+            >
+              <template #reference>
+                <el-button type="primary" size="small" icon="Delete"></el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -29,65 +45,153 @@
         size="large"
         :background="false"
         layout=" prev, pager, next, jumper,->,total, sizes"
-        :total="132"
+        :total="total"
         @size-change="changeSize"
         @current-change="getCurrentList"
       />
     </el-card>
     <!-- 对话框 -->
-    <el-dialog title="添加品牌" v-model="dialogFormVisible">
+    <el-dialog
+      :title="trademarkParams.id ? '修改品牌' : '增加品牌'"
+      v-model="dialogFormVisible"
+    >
       <el-form
-        :model="form"
-        ref="form"
+        :model="trademarkParams"
+        :rules="rules"
+        ref="formRef"
         label-width="80px"
         :inline="false"
         size="normal"
       >
-        <el-form-item label="品牌名称">
-          <el-input v-model="trademarkName"></el-input>
+        <el-form-item label="品牌名称" prop="tmName">
+          <el-input v-model="trademarkParams.tmName"></el-input>
         </el-form-item>
-        <el-form-item label="品牌头像"> 
+        <el-form-item label="品牌头像" prop="logoUrl">
           <el-upload
             class="avatar-uploader"
             action="/api/admin/product/fileUpload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
-            
           >
-            <img v-if="trademarkParams.logoUrl" :src="trademarkParams.logoUrl" class="avatar" />
+            <img
+              v-if="trademarkParams.logoUrl"
+              :src="trademarkParams.logoUrl"
+              class="avatar"
+            />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
       </el-form>
 
       <template #footer>
-        <el-button @click=" dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="">确认</el-button>
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button type="primary" @click="confirmTM">确认</el-button>
       </template>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { reqGetTradeMarkList } from "../../../api/product/trademark";
+import { nextTick, onMounted, ref } from "vue";
+import { reqGetTradeMarkList,reqUpdateorAddTradeMark,reqDeleteTradeMark } from "../../../api/product/trademark";
 import type { Records } from "../../../api/product/trademark/type";
 import { ElMessage, type UploadProps } from 'element-plus'
+
+const total = ref(0);
 const limit = ref(3);
 const currentPage = ref(1);
 const currentTradeMarkList = ref<Records>([]);
+let formRef = ref()
 const dialogFormVisible = ref(false);
-const trademarkName = ref("");
-const trademarkParams = ref({
+const trademarkParams = ref<any>({
+
   tmName:'',
-  logoUrl:''  
+  logoUrl:''
 })
-const addTradeMark = () => {
-  dialogFormVisible.value = true;
+const deleteTradeMark = async (row:any,)=>{
+  let res:any = await reqDeleteTradeMark(row.id)
+  if(res.code ==200){
+    ElMessage({
+      type:'success',
+      message:'删除成功'
+    })
+  }else{
+      ElMessage({
+        type:'warning',
+        message:'删除失败'
+      })
+
+  }
+  getCurrentList(currentTradeMarkList.value.length>1 ? currentPage.value: currentPage.value -1 )
+
+}
+
+const validateTmName = (rule:any,value:string,callback:any)=>{
+  if(value.length<3){
+    callback(new Error('品牌名称长度不能小于3'))
+  }else{
+    callback()
+  }
+}
+const validatelogoUrl = (rule:any,value:string,callback:any)=>{
+  console.log(value);
+
+  if(value){
+    callback()
+  }else{
+    callback(new Error('请上传图片'))
+  }
+  }
+
+
+const rules = {
+  tmName: [
+    { required: true, trigger: "blur" ,validator:validateTmName},
+  ],
+  logoUrl:[{ required: true, trigger: "blur" ,validator:validatelogoUrl}]
 };
-const editTradeMark = () => {
+
+const confirmTM = async () => {
+
+  await formRef.value.validate()
+  let res:any = await reqUpdateorAddTradeMark(trademarkParams.value)
+  console.log(res);
+
+  if(res.code == 200){
+    ElMessage({
+      type:'success',
+      message:trademarkParams.value.id ?'修改成功':'添加成功'
+    })
+    dialogFormVisible.value = false
+    getCurrentList(trademarkParams.value.id? currentPage.value:undefined)
+  }else{
+    ElMessage({
+      type:'error',
+      message:trademarkParams.value.id ?'修改失败':'添加失败'    })
+
+      dialogFormVisible.value = false
+
+  }
+}
+const addTradeMark = () => {
+
   dialogFormVisible.value = true;
+  trademarkParams.value.id = undefined
+  trademarkParams.value.tmName = ''
+  trademarkParams.value.logoUrl = ''
+  nextTick(()=>{
+    formRef.value.resetFields()
+  })
+};
+const editTradeMark = (row:any) => {
+  dialogFormVisible.value = true;
+  trademarkParams.value.id = row.id
+  trademarkParams.value.tmName = row.tmName
+  trademarkParams.value.logoUrl = row.logoUrl
+  nextTick(()=>{
+    formRef.value.resetFields()
+  })
 };
 const changeSize = () => {
   getCurrentList();
@@ -96,9 +200,9 @@ const changeSize = () => {
 const getCurrentList = async (pager = 1) => {
   currentPage.value = pager;
   let res = await reqGetTradeMarkList(limit.value, currentPage.value);
-  console.log(res);
   if (res.code == 200) {
     currentTradeMarkList.value = res.data.records;
+    total.value = res.data.total;
   }
 };
 onMounted(() => {
@@ -128,8 +232,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
   response,
 ) => {
-  console.log(111);
-  
+
   trademarkParams.value.logoUrl = response.data
   ElMessage({
     type:'success',
@@ -168,4 +271,3 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (
   text-align: center;
 }
 </style>
-
